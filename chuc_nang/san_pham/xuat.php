@@ -1,0 +1,74 @@
+<?php 
+
+	//xuat theo the loai
+	
+	$id=$_GET['id'];//lay id the loai
+	
+	$so_du_lieu=15;
+	$tv="select count(*) from san_pham where thuoc_the_loai='$id';";
+	$tv_1=mysqli_query($conn,$tv);
+	$tv_2=mysqli_fetch_array($tv_1);
+	
+	$so_trang=ceil($tv_2[0]/$so_du_lieu); //tinh so trang
+	
+	if(!isset($_GET['trang'])){$vtbd=0;}else{$vtbd=($_GET['trang']-1)*$so_du_lieu;}
+	// nếu k có trang thì bắt đầu từ sp 0.
+
+	$tv="select id,ten,gia,hinh_anh,thuoc_the_loai from san_pham where thuoc_the_loai='$id' order by id desc limit $vtbd,$so_du_lieu";
+	$tv_1=mysqli_query($conn,$tv);
+	echo "<table>";
+
+	while($tv_2=mysqli_fetch_array($tv_1))
+	{
+		//dòng mới
+		echo "<tr>";
+			for($i=1;$i<=3;$i++)
+			{
+				//cột mới
+				echo "<td align='center' width='215px' valign='top' >";
+					if($tv_2!=false) //ktra còn dữ liệu thì in ra
+					{
+						$link_anh="hinh_anh/san_pham/".$tv_2['hinh_anh'];
+						$link_chi_tiet="?thamso=chi_tiet_san_pham&id=".$tv_2['id'];
+						$gia=$tv_2['gia'];
+						$gia=number_format($gia,0,",",".");
+						echo "<a href='$link_chi_tiet' >";
+							echo "<img src='$link_anh' width='150px' >";
+						echo "</a>";
+						echo "<br>";
+						echo "<br>";
+						echo "<a href='$link_chi_tiet' >";
+							echo $tv_2['ten'];
+						echo "</a>";
+						echo "<div style='margin-top:5px' >";						
+						echo $gia;
+						echo "</div>";
+						echo "<br>";
+					}
+					else 
+					{
+						echo "&nbsp;";
+					}
+				echo "</td>";
+				if($i!=3) //ktra nếu != 3 thì lấy dl để in cột tiếp theo, tránh mất dữ liệu
+				{
+					$tv_2=mysqli_fetch_array($tv_1);
+				}
+			}
+		echo "</tr>";
+	}
+	echo "<tr>";
+		echo "<td colspan='3' align='center' >";
+			echo "<div class='phan_trang' >";
+				for($i=1;$i<=$so_trang;$i++)
+				{
+					$link="?thamso=xuat_san_pham&id=".$_GET['id']."&trang=".$i;
+					echo "<a href='$link' >";
+						echo $i;echo " ";
+					echo "</a>";
+				}
+			echo "</div>";
+		echo "</td>";
+	echo "</tr>";
+	echo "</table>";
+?>
